@@ -1,0 +1,13 @@
+services:
+  db:
+    image: "postgres"
+    container_name: rss-postgres
+    environment:
+      POSTGRES_PASSWORD: hello
+    ports:
+      - "5432:5432"
+    volumes:
+      - rss-db:/var/lib/postgresql/data
+
+volumes:
+  rss-db:
