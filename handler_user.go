@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
+	"github.com/Kartik-Saini77/RSS_Aggregator/internal/auth"
 	"github.com/Kartik-Saini77/RSS_Aggregator/internal/database"
 	"github.com/google/uuid"
 )
@@ -29,10 +31,27 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 		Name: params.Name,
 	})
 	if err != nil {
+		log.Println(user)
 		respondWithError(w, 400, fmt.Sprintf("Couldn't create user: %v", err))
 		return
 
 	}
 
-	respondWithJson(w, 201, user)
+	respondWithJson(w, 201, databaseUsertoUser(user))
+}
+
+func (apiCfg *apiConfig) handlerGetUser(w http.ResponseWriter, r *http.Request) {
+	apiKey, err := auth.GetAPIKey(r.Header)
+	if err != nil {
+		respondWithError(w, 403, fmt.Sprintf("Auth error: %v", err))
+		return
+	}
+
+	user, err := apiCfg.DB.GetUsersByAPIKey(r.Context(), apiKey)
+	if err != nil {
+		respondWithError(w, 404, fmt.Sprintf("User not found: %v", err))
+		return
+	}
+
+	respondWithJson(w, 200, databaseUsertoUser(user))
 }
