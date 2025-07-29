@@ -43,7 +43,7 @@ func main() {
 		DB: db,
 	}
 
-	startScraping(db, 10, 10 * time.Second)	
+	go startScraping(db, 10, 1 * time.Minute)
 
 	router := chi.NewRouter()
 
@@ -64,6 +64,8 @@ func main() {
 
 	v1Router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerCreateFeed))
 	v1Router.Get("/feeds", apiCfg.handlerGetFeeds)
+
+	v1Router.Get("/posts", apiCfg.middlewareAuth(apiCfg.handlerGetPostsForUser))
 
 	v1Router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerCreateFeedFollow))
 	v1Router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerGetFeedFollows))
